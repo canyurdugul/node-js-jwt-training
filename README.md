@@ -9,6 +9,12 @@ Please run the below code for docker requirements. It will install Seq for loggi
 docker-compose up -d
 ```
 
+Please run the below code for npm packages.
+
+```bash
+npm install
+```
+
 Please run this code for the database seed.
 
 ```bash
@@ -17,7 +23,7 @@ node ./database/database_seed.js
 
 At the end
 ```bash
-npm install
+node app.js
 ```
 
 
