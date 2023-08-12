@@ -3,8 +3,6 @@ const db = require("./database.js");
 
 async function seedData() {
   try {
-    let index = 0;
-
     const dataToSeed = [
       {
         name: "John",
@@ -18,7 +16,7 @@ async function seedData() {
       const seed = new User(element);
       seed.save();
     });
- 
+
   } catch (error) {
     console.error("An error occurred:", error);
   } finally {
