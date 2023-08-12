@@ -1,0 +1,30 @@
+version: "3"
+services:
+  seq:
+    image: datalust/seq:latest
+    container_name: "jwt-app-seq"
+    ports:
+      - 5341:80
+    volumes:
+      - ./data/seq:/data/seq
+    environment:
+      ACCEPT_EULA: "Y"
+
+  mongodb:
+    image: mongo:latest
+    container_name: "jwt-app-mongo"
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/db:/data/db
+    environment:
+      node.name: "jwt-app"
+
+  redis:
+    image: redis:latest
+    container_name: "jwt-app-redis"
+    ports:
+      - 6379:6379
+    command: redis-server
+    environment:
+      node.name: "jwt-app"
