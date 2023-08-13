@@ -8,8 +8,6 @@ database
   })
   .then(() => {
     console.log("Connected to MongoDB");
-    console.log("Data seed started.");
-    console.log("Data seed finished.");
   })
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);

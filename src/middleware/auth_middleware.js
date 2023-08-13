@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const logger = require("../logging/logging");
+const User = require("../models/user_model");
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -7,16 +8,26 @@ function authMiddleware(req, res, next) {
   if (!authHeader) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-
   const token = authHeader.split(" ")[1];
 
-  jwt.verify(token, "secretKey", (err, decoded) => {
+  jwt.verify(token, "secretKey", async (err, decoded) => {
     if (err) {
-      logger.error("Unauthorized access:", err);
-      return res.status(401).json({ message: "Unauthorized" });
+      logger.error("Unauthorized access to " + req.originalUrl + " ", {
+        method: req.method,
+        url: req.originalUrl,
+        params: req.params,
+        body: req.body,
+        error: err,
+        token: token,
+        ipAddress: req.socket.remoteAddress,
+      });
     }
 
-    req.user = decoded.username;
+    req.username = decoded.username;
+    const user = await User.findOne({ username: req.username });
+    if (user.isDeleted) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     next();
   });
 }

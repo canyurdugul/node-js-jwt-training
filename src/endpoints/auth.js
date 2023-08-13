@@ -11,10 +11,14 @@ router.post("/token", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    console.log({ username });
-    const user = await User.findOne({ username });
-    console.log(user);
-    if (!user || user.password != password) {
+    const user = await User.findOne({ username: username });
+    if (!user || user.password != password || user.isDeleted) {
+      logger.error(
+        "Error while logging in for " +
+          username +
+          ": " +
+          (user.isDeleted ? " Deleted User" : "Wrong password")
+      );
       return res.status(401).json({ message: "Unauthorized" });
     }
 
@@ -37,15 +41,13 @@ router.post("/token", async (req, res) => {
     logger.info(`User '${username}' logged in and received tokens.`);
     res.json(response);
   } catch (error) {
-    debugger;
-    logger.error("Error while logging in:", error);
+    logger.error("Error while logging in for" + username + ":", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
 router.post("/refresh-token", async (req, res) => {
   const { refreshToken } = req.body;
-
   try {
     jwt.verify(refreshToken, "refreshSecretKey", (err, decoded) => {
       if (err) {
@@ -58,7 +60,7 @@ router.post("/refresh-token", async (req, res) => {
         if (err) {
           return res.status(500).json({ message: "Internal Server Error" });
         }
-
+        console.log("In Redis");
         if (refreshToken === cachedToken) {
           const accessToken = jwt.sign({ username }, "secretKey", {
             expiresIn: "15m",
